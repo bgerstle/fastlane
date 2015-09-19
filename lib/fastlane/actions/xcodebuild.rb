@@ -26,6 +26,7 @@ module Fastlane
         configuration: "-configuration",
         derivedDataPath: "-derivedDataPath",
         destination_timeout: "-destination-timeout",
+        enable_code_coverage: "-enableCodeCoverage",
         export_archive: "-exportArchive",
         export_format: "-exportFormat",
         export_installer_identity: "-exportInstallerIdentity",
@@ -106,6 +107,18 @@ module Fastlane
 
             # Cache path for later xcodebuild calls
             Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE] = params[:archive_path]
+          end
+
+          if testing
+            params[:enable_code_coverage] ||= 'YES'
+          end
+
+          # map code coverage setting to GCC arguments
+          if enable_code_coverage = params[:enable_code_coverage]
+            build_settings_hash = params[:build_settings] || {}
+            build_settings_hash['GCC_INSTRUMENT_PROGRAM_FLOW_ARCS'] ||= enable_code_coverage
+            build_settings_hash['GCC_GENERATE_TEST_COVERAGE_FILES'] ||= enable_code_coverage
+            params[:build_settings] = build_settings_hash
           end
 
           # Maps parameter hash to CLI args

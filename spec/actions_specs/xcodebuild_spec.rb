@@ -24,6 +24,7 @@ describe Fastlane do
             derived_data_path: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
+            enable_code_coverage: 'YES',
             export_archive: true,
             export_format: 'ipa',
             export_installer_identity: true,
@@ -52,6 +53,7 @@ describe Fastlane do
           + "-configuration \"Debug\" " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination-timeout \"240\" " \
+          + "-enableCodeCoverage \"YES\" " \
           + "-exportArchive " \
           + "-exportFormat \"ipa\" " \
           + "-exportInstallerIdentity " \
@@ -67,6 +69,8 @@ describe Fastlane do
           + "-target \"MyAppTarget\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "-xcconfig \"my.xcconfig\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"YES\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"YES\" " \
           + "OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" " \
           + "analyze " \
           + "archive " \
@@ -298,7 +302,7 @@ describe Fastlane do
     end
 
     describe "xctest" do
-      it "is equivalent to 'xcodebuild test'" do
+      it "is equivalent to 'xcodebuild test' (with coverage enabled by default)" do
         result = Fastlane::FastFile.new.parse("lane :test do
           xctest(
             destination: 'name=iPhone 5s,OS=8.1',
@@ -313,8 +317,37 @@ describe Fastlane do
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
           + "-destination-timeout \"240\" " \
+          + "-enableCodeCoverage \"YES\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"YES\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"YES\" " \
+          + "test " \
+          + "| xcpretty --color --test"
+        )
+      end
+
+      it "should disable GCC code coverage arguments if enable_code_coverage is NO" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xctest(
+            destination: 'name=iPhone 5s,OS=8.1',
+            destination_timeout: 240,
+            enable_code_coverage: 'NO',
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-destination-timeout \"240\" " \
+          + "-enableCodeCoverage \"NO\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"NO\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"NO\" " \
           + "test " \
           + "| xcpretty --color --test"
         )
@@ -337,8 +370,11 @@ describe Fastlane do
           "set -o pipefail && " \
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-enableCodeCoverage \"YES\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"YES\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"YES\" " \
           + "test " \
           + "| xcpretty --color " \
           + "--report junit " \
@@ -364,8 +400,11 @@ describe Fastlane do
           "set -o pipefail && " \
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-enableCodeCoverage \"YES\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"YES\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"YES\" " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
@@ -391,8 +430,11 @@ describe Fastlane do
           "set -o pipefail && " \
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-enableCodeCoverage \"YES\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"YES\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"YES\" " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
@@ -424,8 +466,11 @@ describe Fastlane do
           "set -o pipefail && " \
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-enableCodeCoverage \"YES\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"YES\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"YES\" " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
@@ -458,8 +503,11 @@ describe Fastlane do
           "set -o pipefail && " \
           + "xcodebuild " \
           + "-destination \"name=iPhone 5s,OS=8.1\" " \
+          + "-enableCodeCoverage \"YES\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
+          + "GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=\"YES\" " \
+          + "GCC_GENERATE_TEST_COVERAGE_FILES=\"YES\" " \
           + "test " \
           + "| xcpretty --color " \
           + "--report html " \
