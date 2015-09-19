@@ -113,14 +113,6 @@ module Fastlane
             params[:enable_code_coverage] ||= 'YES'
           end
 
-          # map code coverage setting to GCC arguments
-          if enable_code_coverage = params[:enable_code_coverage]
-            build_settings_hash = params[:build_settings] || {}
-            build_settings_hash['GCC_INSTRUMENT_PROGRAM_FLOW_ARCS'] ||= enable_code_coverage
-            build_settings_hash['GCC_GENERATE_TEST_COVERAGE_FILES'] ||= enable_code_coverage
-            params[:build_settings] = build_settings_hash
-          end
-
           # Maps parameter hash to CLI args
           if hash_args = hash_to_args(params)
             xcodebuild_args += hash_args
